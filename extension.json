@@ -1,0 +1,36 @@
+{
+  "name": "Agora",
+  "author": [
+    "Telepedia Ltd."
+  ],
+  "url": "https://github.com/telepedia/agora/",
+  "descriptionmsg": "agora-desc",
+  "license-name": "GPL-3.0-or-later",
+  "type": "other",
+  "version": "0.0.0-alpha",
+  "requires": {
+    "MediaWiki": ">= 1.43.0"
+  },
+  "MessagesDirs": {
+    "Agora": [
+      "i18n"
+    ]
+  },
+  "AutoloadNamespaces": {
+    "Telepedia\\Extensions\\Agora\\": "includes"
+  },
+  "ServiceWiringFiles": [
+    "includes/ServiceWiring.php"
+  ],
+  "HookHandlers": {},
+  "Hooks": {},
+  "ResourceFileModulePaths": {
+    "localBasePath": "resources",
+    "remoteExtPath": "Agora/resources"
+  },
+  "ResourceModules": {},
+  "ConfigRegistry": {
+    "Agora": "MediaWiki\\Config\\GlobalVarConfig::newInstance"
+  },
+  "manifest_version": 2
+}
