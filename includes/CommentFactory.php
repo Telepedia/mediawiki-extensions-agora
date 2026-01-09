@@ -3,8 +3,8 @@
 namespace Telepedia\Extensions\Agora;
 
 use InvalidArgumentException;
-use Telepedia\Extensions\Agora\Models\Comment;
-use Telepedia\Extensions\Agora\Models\CommentCollection;
+use Telepedia\Extensions\Agora\Domain\Comment;
+use Telepedia\Extensions\Agora\Domain\CommentCollection;
 use Wikimedia\Rdbms\IConnectionProvider;
 use Wikimedia\Rdbms\Platform\ISQLPlatform;
 
@@ -39,12 +39,12 @@ class CommentFactory {
 			return $comment;
 		}
 
-		$comment->id = $row->comment_id;
-		$comment->pageId = $row->comment_page_id;
-		$comment->wikitext = $row->comment_wikitext;
-		$comment->postedTime = $row->comment_posted_time;
-		$comment->actorId = $row->comment_actor;
-		$comment->parentId = $row->comment_parent_id ?: null;
+		$comment->setId( $row->comment_id )
+			->setPageId( $row->page_id )
+			->setWikiText( $row->comment_wikitext )
+			->setPostedTime( $row->comment_posted_time )
+			->setActorId( $row->comment_actor_id )
+			->setParentId( $row->comment_parent_id ?: null );
 
 		return $comment;
 	}
@@ -78,12 +78,12 @@ class CommentFactory {
 
 		foreach ( $res as $row ) {
 			$comment = new Comment();
-			$comment->id = $row->comment_id;
-			$comment->pageId = $row->comment_page_id;
-			$comment->wikitext = $row->comment_wikitext;
-			$comment->postedTime = $row->comment_posted_time;
-			$comment->actorId = $row->comment_actor;
-			$comment->parentId = $row->comment_parent_id ?: null;
+			$comment->setId( $row->comment_id )
+				->setPageId( $row->page_id )
+				->setWikiText( $row->comment_wikitext )
+				->setPostedTime( $row->comment_posted_time )
+				->setActorId( $row->comment_actor_id )
+				->setParentId( $row->comment_parent_id ?: null );
 
 			$comments[] = $comment;
 		}
@@ -113,12 +113,12 @@ class CommentFactory {
 
 		foreach ( $res as $row ) {
 			$comment = new Comment();
-			$comment->id = $row->comment_id;
-			$comment->pageId = $row->comment_page_id;
-			$comment->wikitext = $row->comment_wikitext;
-			$comment->postedTime = $row->comment_posted_time;
-			$comment->actorId = $row->comment_actor;
-			$comment->parentId = $row->comment_parent_id ?: null;
+			$comment->setId( $row->comment_id )
+				->setPageId( $row->page_id )
+				->setWikiText( $row->comment_wikitext )
+				->setPostedTime( $row->comment_posted_time )
+				->setActorId( $row->comment_actor_id )
+				->setParentId( $row->comment_parent_id ?: null );
 
 			$comments[] = $comment;
 		}
