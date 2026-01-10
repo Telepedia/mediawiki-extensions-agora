@@ -18,6 +18,9 @@ function setupAgora() {
         .mount( agoraContainer );
 }
 
+mw.agora = mw.agora || {};
+mw.agora.ve = mw.agora.ve || {};
+
 ( function () {
     // Run our code to manipulate the DOM after the wikipage is ready and the hook is fired
     mw.hook( 'wikipage.content' ).add( setupAgora );

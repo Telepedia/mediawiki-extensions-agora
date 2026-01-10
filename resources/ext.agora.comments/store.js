@@ -3,11 +3,14 @@ const { defineStore } = require( 'pinia' );
 const useCommentStore = defineStore( 'comments', {
     state: () => ( {
         pageId: null,
+        pageTitle: null,
         totalComments: null,
         canPost: false,
         isModerator: false,
         sortMode: 'newest',
-        showDeleted: false
+        showDeleted: false,
+        isEditorOpen: false,
+        currentUserAvatar: null
     } ),
 
     actions: {
@@ -18,7 +21,9 @@ const useCommentStore = defineStore( 'comments', {
             // @TODO: dynamically get these from stuff to be added to mw.config later
             this.canPost = false;
             this.isModerator = false;
-            this.showDeleted = false
+            this.showDeleted = false;
+            this.currentUserAvatar = mw.config.get( 'wgAgora' ).userAvatar;
+            this.pageTitle = mw.config.get( 'wgPageName' );
         },
 
         setSortMode( mode ) {
@@ -27,6 +32,10 @@ const useCommentStore = defineStore( 'comments', {
 
         toggleShowDeleted() {
             this.showDeleted = !this.showDeleted;
+        },
+
+        toggleEditorOpen() {
+            this.isEditorOpen = !this.isEditorOpen;
         }
     }
 } );

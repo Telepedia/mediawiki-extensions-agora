@@ -48,13 +48,30 @@
         "ext.agora.comments/store.js"
       ],
       "messages": [
-        "agora-comments-header"
+        "agora-comments-header",
+        "agora-comments-input-placeholder"
       ],
       "dependencies": [
-        "pinia"
+        "pinia",
+        "ext.agora.ve"
       ],
       "codexComponents": [
         "CdxButton"
+      ]
+    },
+    "ext.agora.ve": {
+      "packageFiles": [
+        "ext.agora.ve/index.js",
+        "ext.agora.ve/AgoraTarget.js",
+        "ext.agora.ve/AgoraEditor.js",
+        "ext.agora.ve/config.js"
+      ],
+      "messages": [],
+      "dependencies": [
+        "ext.visualEditor.core",
+        "ext.visualEditor.mediawiki",
+        "ext.visualEditor.desktopTarget",
+        "ext.visualEditor.desktopArticleTarget"
       ]
     }
   },
