@@ -65,7 +65,7 @@ class CommentFactory {
 	 * @param int $pageId
 	 * @return CommentCollection
 	 */
-	public function fromPage( int $pageId ): CommentCollection {
+	public function getForPage( int $pageId ): CommentCollection {
 		// throw an error if someone tries a virtual namespace
 		// not sure if MediaWiki page ID's start at 0 or 1 so may need to increment this to 1 if they start at 0
 		if ( $pageId < 0 ) {
@@ -107,7 +107,7 @@ class CommentFactory {
 	 * @param int $actorId
 	 * @return CommentCollection
 	 */
-	public function fromActor( int $actorId ): CommentCollection {
+	public function getFromActor( int $actorId ): CommentCollection {
 		$dbr = $this->connectionProvider->getReplicaDatabase();
 
 		$res = $dbr->newSelectQueryBuilder()
@@ -136,5 +136,13 @@ class CommentFactory {
 			$comments[] = $comment;
 		}
 		return new CommentCollection( $comments );
+	}
+
+	/**
+	 * Return a new comment to be populated with content
+	 * @return Comment
+	 */
+	public function getBlank(): Comment {
+		return new Comment();
 	}
 }
