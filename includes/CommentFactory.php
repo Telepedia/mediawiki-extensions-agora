@@ -2,11 +2,10 @@
 
 namespace Telepedia\Extensions\Agora;
 
-use InvalidArgumentException;
+use stdClass;
 use Telepedia\Extensions\Agora\Domain\Comment;
 use Telepedia\Extensions\Agora\Domain\CommentCollection;
 use Wikimedia\Rdbms\IConnectionProvider;
-use Wikimedia\Rdbms\Platform\ISQLPlatform;
 
 class CommentFactory {
 
@@ -27,37 +26,29 @@ class CommentFactory {
 	/**
 	 * Return a single comment from a database id
 	 * @param int $id
-	 * @return Comment
+	 * @return ?Comment
 	 */
-	public function newFromId( int $id ): Comment {
+	public function newFromId( int $id ): ?Comment {
 		$dbr = $this->connectionProvider->getReplicaDatabase();
+		$queryInfo = $this->getQueryInfo();
 
 		$row = $dbr->newSelectQueryBuilder()
-			->select( ISQLPlatform::ALL_ROWS )
-			->from( self::TABLE_NAME )
-			->where(
-				[
-					'comment_id' => $id,
-				]
+			->select( $queryInfo['fields'] )
+			->from( $queryInfo['tables']['c'] )
+			->join(
+				$queryInfo['tables']['r'],
+				'r',
+				$queryInfo['tables']['r'][1]
 			)
+			->where( [ 'c.comment_id' => $id ] )
 			->caller( __METHOD__ )
 			->fetchRow();
 
-		$comment = new Comment();
-
-		if ( $row == null ) {
-			return $comment;
+		if ( !$row ) {
+			return null;
 		}
 
-		$comment->setId( $row->comment_id )
-			->setPageId( $row->page_id )
-			// needs to come from join on revision table
-			->setWikiText( $row->comment_wikitext )
-			->setPostedTime( $row->comment_posted_time )
-			->setActorId( $row->comment_actor_id )
-			->setParentId( $row->comment_parent_id ?: null );
-
-		return $comment;
+		return $this->rowToComment( $row );
 	}
 
 	/**
@@ -66,40 +57,7 @@ class CommentFactory {
 	 * @return CommentCollection
 	 */
 	public function getForPage( int $pageId ): CommentCollection {
-		// throw an error if someone tries a virtual namespace
-		// not sure if MediaWiki page ID's start at 0 or 1 so may need to increment this to 1 if they start at 0
-		if ( $pageId < 0 ) {
-			throw new InvalidArgumentException("Page ID must be a positive integer." );
-		}
-
-		$dbr = $this->connectionProvider->getReplicaDatabase();
-
-		$res = $dbr->newSelectQueryBuilder()
-			->select( ISQLPlatform::ALL_ROWS )
-			->from( self::TABLE_NAME )
-			->where(
-				[
-					'comment_page_id' => $pageId,
-				]
-			)
-			->caller( __METHOD__ )
-			->fetchResultSet();
-
-		$comments = [];
-
-		foreach ( $res as $row ) {
-			$comment = new Comment();
-			$comment->setId( $row->comment_id )
-				->setPageId( $row->page_id )
-				// needs to come from join on new revision table
-				->setWikiText( $row->comment_wikitext )
-				->setPostedTime( $row->comment_posted_time )
-				->setActorId( $row->comment_actor_id )
-				->setParentId( $row->comment_parent_id ?: null );
-
-			$comments[] = $comment;
-		}
-		return new CommentCollection( $comments );
+		// no-op at present
 	}
 
 	/**
@@ -108,34 +66,7 @@ class CommentFactory {
 	 * @return CommentCollection
 	 */
 	public function getFromActor( int $actorId ): CommentCollection {
-		$dbr = $this->connectionProvider->getReplicaDatabase();
-
-		$res = $dbr->newSelectQueryBuilder()
-			->select( ISQLPlatform::ALL_ROWS )
-			->from( self::TABLE_NAME )
-			->where(
-				[
-					'comment_actor' => $actorId,
-				]
-			)
-			->caller( __METHOD__ )
-			->fetchResultSet();
-
-		$comments = [];
-
-		foreach ( $res as $row ) {
-			$comment = new Comment();
-			$comment->setId( $row->comment_id )
-				->setPageId( $row->page_id )
-				// needs to come from join on revision table
-				->setWikiText( $row->comment_wikitext )
-				->setPostedTime( $row->comment_posted_time )
-				->setActorId( $row->comment_actor_id )
-				->setParentId( $row->comment_parent_id ?: null );
-
-			$comments[] = $comment;
-		}
-		return new CommentCollection( $comments );
+		// no-op for now
 	}
 
 	/**
@@ -144,5 +75,70 @@ class CommentFactory {
 	 */
 	public function getBlank(): Comment {
 		return new Comment();
+	}
+
+	/**
+	 * Get the parent comment of this comment
+	 * @param Comment $comment either the comment object, or null if the comment is a parent
+	 * @return ?Comment
+	 */
+	public function getParent( Comment $comment ): ?Comment {
+		if ( $comment->getParentId() !== null ) {
+			return $this->newFromId( $comment->getParentId() );
+		}
+		return null;
+	}
+
+	/**
+	 * Helper function to help hydrate a comment (agora_comments) with its contents (agora_comment_revision)
+	 * @return array
+	 */
+	private function getQueryInfo(): array {
+		return [
+			'tables' => [
+				// agora_comments
+				'c' => self::TABLE_NAME,
+				// agora_comment_revision
+				'r' => self::REVISION_TABLE_NAME
+			],
+			'fields' => [
+				'c.comment_id',
+				'c.page_id',
+				'c.comment_actor_id',
+				'c.comment_parent_id',
+				'c.comment_posted_time',
+				'c.comment_deleted_actor',
+				'r.comment_wikitext',
+				'r.comment_html'
+			],
+			'joins' => [
+				'r' => [
+					'LEFT JOIN',
+					'c.comment_latest_rev_id = r.comment_rev_id'
+				]
+			]
+		];
+	}
+
+	/**
+	 * Convert a database row into a comment object
+	 * @param stdClass $row
+	 * @return Comment
+	 */
+	private function rowToComment( stdClass $row ): Comment {
+		$comment = $this->getBlank()
+			->setId( ( int )$row->comment_id )
+			->setPageId( ( int )$row->page_id )
+			->setActorId( ( int )$row->comment_actor_id )
+			->setParentId( $row->comment_parent_id ? (int)$row->comment_parent_id : null )
+			->setPostedTime( $row->comment_posted_time )
+			->setWikiText( $row->comment_wikitext )
+			->setHtml( $row->comment_html );
+
+		if ( $row->comment_deleted_actor ) {
+			$comment->setActorForDeletion( ( int )$row->comment_deleted_actor );
+		}
+
+		return $comment;
 	}
 }

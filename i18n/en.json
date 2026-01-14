@@ -3,6 +3,11 @@
   "agora-comments-header": "$1 Comments",
   "agora-comments-input-placeholder": "Add a comment about $1",
   "agora-ve-placeholder": "What's on your mind?",
-  "agora-error-not-allowed": "You are unable to post comments.",
-  "restriction-commenting": "Commenting"
+  "agora-error-not-allowed": "You are unable to post comments",
+  "restriction-commenting": "Commenting",
+  "agora-error-malformed-request": "The request was malformed. It must include either an articleId or parentId",
+  "agora-error-malformed-wikitext": "The request was malformed. The request must contain the wikitext parameter",
+  "agora-error-parent-deleted": "Cannot reply to this comment as it is deleted",
+  "agora-error-parent": "Cannot reply to this comment as it has a parent",
+  "agora-error-comments-disabled": "Comments are not enabled on this article"
 }

@@ -10,7 +10,7 @@ class Comment {
 	 * Unique database ID for this comment
 	 * @var int
 	 */
-	private int $id;
+	private ?int $id = null;
 
 	/**
 	 * Page ID that this comment belongs to
@@ -44,15 +44,21 @@ class Comment {
 
 	/**
 	 * Is this comment deleted?
-	 * @var bool
+	 * @var ?int
 	 */
-	private bool $deleted = false;
+	private ?int $deletedActor = null;
 
 	/**
 	 * Title instance for the article this comment was posted on
 	 * @var Title
 	 */
 	private Title $pageTitle;
+
+	/**
+	 * HTML representation of this comment
+	 * @var string
+	 */
+	private string $html;
 
 	public function __construct() {}
 
@@ -141,9 +147,9 @@ class Comment {
 
 	/**
 	 * Get the ID of this comment
-	 * @return int
+	 * @return ?int
 	 */
-	public function getId(): int {
+	public function getId(): ?int {
 		return $this->id;
 	}
 
@@ -186,4 +192,39 @@ class Comment {
 		return $this;
 	}
 
+	/**
+	 * Is this comment deleted?
+	 * @return bool
+	 */
+	public function isDeleted(): bool {
+		return $this->deletedActor !== null;
+	}
+
+	/**
+	 * Get whether this comment is deleted
+	 * @param int $deleted
+	 * @return self
+	 */
+	public function setActorForDeletion( int $actor ): self {
+		$this->deletedActor = $actor;
+		return $this;
+	}
+
+	/**
+	 * Get the HTML for this comment
+	 * @return string
+	 */
+	public function getHTML(): string {
+		return $this->html;
+	}
+
+	/**
+	 * Set the HTML for this comment and return the object
+	 * @param string $html
+	 * @return $this
+	 */
+	public function setHTML( string $html ): self {
+		$this->html = $html;
+		return $this;
+	}
 }

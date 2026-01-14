@@ -9,6 +9,7 @@ CREATE TABLE /*_*/agora_comments (
   comment_parent_id INT UNSIGNED DEFAULT NULL,
   comment_posted_time BINARY(14) NOT NULL,
   comment_latest_rev_id INT UNSIGNED DEFAULT NULL,
+  comment_deleted_actor INT UNSIGNED DEFAULT NULL,
   INDEX comment_page (page_id),
   INDEX comment_page_posted_time (page_id, comment_posted_time),
   INDEX comment_parent (comment_parent_id),

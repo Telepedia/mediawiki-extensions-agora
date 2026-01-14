@@ -58,6 +58,16 @@
           "unsigned": true,
           "notnull": false
         }
+      },
+      {
+        "name": "comment_deleted_actor",
+        "comment": "Whether the comment is deleted",
+        "type": "integer",
+        "options": {
+          "unsigned": true,
+          "notnull": false,
+          "default": null
+        }
       }
     ],
     "indexes": [
