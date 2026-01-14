@@ -22,6 +22,9 @@
   "ServiceWiringFiles": [
     "includes/ServiceWiring.php"
   ],
+  "AvailableRights": [
+    "comments"
+  ],
   "HookHandlers": {
     "main": {
       "class": "Telepedia\\Extensions\\Agora\\Hooks\\MainHandler"
@@ -53,11 +56,13 @@
       ],
       "messages": [
         "agora-comments-header",
-        "agora-comments-input-placeholder"
+        "agora-comments-input-placeholder",
+        "agora-error-empty-comment"
       ],
       "dependencies": [
         "pinia",
-        "ext.agora.ve"
+        "ext.agora.ve",
+        "telepedia.fetch"
       ],
       "codexComponents": [
         "CdxButton"
@@ -79,6 +84,20 @@
       ]
     }
   },
+  "RestRoutes": [
+    {
+      "path": "/comments/v0/comment",
+      "method": [
+        "POST"
+      ],
+      "class": "Telepedia\\Extensions\\Agora\\Rest\\PostCommentHandler",
+      "services": [
+        "Agora.CommentFactory",
+        "Agora.CommentService",
+        "TitleFactory"
+      ]
+    }
+  ],
   "ConfigRegistry": {
     "Agora": "MediaWiki\\Config\\GlobalVarConfig::newInstance"
   },

@@ -24,6 +24,7 @@
 </template>
 
 <script>
+const restClient = require( 'telepedia.fetch' );
 const { defineComponent, ref, nextTick } = require( 'vue' );
 const { useCommentStore } = require( './store.js' );
 const { CdxButton } = require( './../codex.js' );
@@ -81,9 +82,27 @@ module.exports = defineComponent( {
       store.isEditorOpen = false;
     }
 
-    const saveComment = () => {
-      let content = editorInstance.getSurface().getHtml();
-      console.debug( "[DEBUG]: ", content );
+    /**
+     * Save the comment to the backend. Here we only send the wikitext to the API as the source of truth. The backend
+     * will parse using Parsoid, save the HTML to the database, and then return both the HTML and the Wikitext for
+     * addition to the frontend. This also has the benefit that Parsoid will sanitise the input
+     * @returns {Promise<void>}
+     */
+    const saveComment = async () => {
+      const surface = editorInstance.getSurface();
+      const doc = surface.getModel().getDocument();
+      const wikitext = await editorInstance.getWikitextFragment( doc );
+
+      if ( wikitext.length === 0 ) {
+        mw.notify( mw.message("agora-error-empty-comment"), { type: "error" } );
+        return;
+      }
+
+      const res = await restClient.post( '/comments/v0/comment', {
+        articleId: mw.config.get( 'wgRelevantArticleId' ),
+        wikitext: wikitext,
+        token: mw.user.tokens.get( 'csrfToken' )
+      } );
     }
 
     return {

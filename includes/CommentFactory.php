@@ -17,7 +17,7 @@ class CommentFactory {
 	/**
 	 * Table name for the revision table to avoid writing it all the time
 	 */
-	private const REVISION_TABLE_NAME = 'agora_comment_revisions';
+	private const REVISION_TABLE_NAME = 'agora_comment_revision';
 
 	public function __construct(
 		private readonly IConnectionProvider $connectionProvider
@@ -34,11 +34,11 @@ class CommentFactory {
 
 		$row = $dbr->newSelectQueryBuilder()
 			->select( $queryInfo['fields'] )
-			->from( $queryInfo['tables']['c'] )
+			->from( $queryInfo['tables']['c'], 'c' )
 			->join(
 				$queryInfo['tables']['r'],
 				'r',
-				$queryInfo['tables']['r'][1]
+				$queryInfo['joins']['r'][1]
 			)
 			->where( [ 'c.comment_id' => $id ] )
 			->caller( __METHOD__ )

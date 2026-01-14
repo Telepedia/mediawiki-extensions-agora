@@ -9,5 +9,6 @@
   "agora-error-malformed-wikitext": "The request was malformed. The request must contain the wikitext parameter",
   "agora-error-parent-deleted": "Cannot reply to this comment as it is deleted",
   "agora-error-parent": "Cannot reply to this comment as it has a parent",
-  "agora-error-comments-disabled": "Comments are not enabled on this article"
+  "agora-error-comments-disabled": "Comments are not enabled on this article",
+  "agora-error-empty-comment": "Comment is empty"
 }

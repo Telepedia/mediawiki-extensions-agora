@@ -5,8 +5,8 @@ namespace Telepedia\Extensions\Agora;
 use MediaWiki\Config\ServiceOptions;
 use MediaWiki\MainConfigNames;
 use MediaWiki\MediaWikiServices;
+use MediaWiki\Permissions\Authority;
 use MediaWiki\Permissions\RestrictionStore;
-use MediaWiki\Permissions\UserAuthority;
 use MediaWiki\Title\Title;
 use ParserOptions;
 use Psr\Log\LoggerInterface;
@@ -95,10 +95,10 @@ class CommentService {
 
 	/**
 	 * Check whether the current user is able to post comments
-	 * @param UserAuthority $user the authority of the user in question
+	 * @param Authority $user the authority of the user in question
 	 * @return bool true if they can, false otherwise
 	 */
-	public function userCanComment( UserAuthority $user ): bool {
+	public function userCanComment( Authority $user ): bool {
 		if ( !$user->isDefinitelyAllowed( 'comments' ) ) {
 			return false;
 		}

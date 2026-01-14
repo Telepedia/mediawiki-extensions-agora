@@ -52,7 +52,7 @@ class Comment {
 	 * Title instance for the article this comment was posted on
 	 * @var Title
 	 */
-	private Title $pageTitle;
+	private ?Title $pageTitle = null;
 
 	/**
 	 * HTML representation of this comment
@@ -142,7 +142,8 @@ class Comment {
 			return $this->pageTitle;
 		}
 
-		return Title::newFromID( $this->pageId );
+		$this->pageTitle = Title::newFromID( $this->pageId );
+		return $this->pageTitle;
 	}
 
 	/**

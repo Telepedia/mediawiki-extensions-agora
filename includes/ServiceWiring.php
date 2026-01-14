@@ -3,6 +3,7 @@
 use MediaWiki\Config\ServiceOptions;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
+use Telepedia\Extensions\Agora\CommentFactory;
 use Telepedia\Extensions\Agora\CommentService;
 
 return [
@@ -14,6 +15,14 @@ return [
 			LoggerFactory::getInstance( 'Agora' ),
 			$services->getConnectionProvider(),
 			$services->getRestrictionStore()
+		);
+	},
+
+	'Agora.CommentFactory' => static function (
+		MediaWikiServices $services
+	): CommentFactory {
+		return new CommentFactory(
+			$services->getConnectionProvider()
 		);
 	},
 ];
