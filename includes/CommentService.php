@@ -205,6 +205,6 @@ class CommentService {
 		$user = $userFactory->newFromActorId( $actorId );
 		$parserOpts = ParserOptions::newFromUser( $user );
 
-		return $parsoidFactory->parse( $wt, $title,$parserOpts )->runOutputPipeline( $parserOpts )->getText();
+		return $parsoidFactory->parse( $wt, $title,$parserOpts )->getText();
 	}
 }

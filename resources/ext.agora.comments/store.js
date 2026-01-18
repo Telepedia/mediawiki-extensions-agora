@@ -1,4 +1,6 @@
 const { defineStore } = require( 'pinia' );
+const restClient = require( 'telepedia.fetch' );
+const Comment = require( './comment.js' );
 
 const useCommentStore = defineStore( 'comments', {
     state: () => ( {
@@ -9,6 +11,7 @@ const useCommentStore = defineStore( 'comments', {
         isModerator: false,
         sortMode: 'newest',
         showDeleted: false,
+        comments: null,
         isEditorOpen: false,
         currentUserAvatar: null
     } ),
@@ -36,6 +39,17 @@ const useCommentStore = defineStore( 'comments', {
 
         toggleEditorOpen() {
             this.isEditorOpen = !this.isEditorOpen;
+        },
+
+        async fetchComments() {
+            const response  =  await restClient.get( `/comments/v0/comments/${this.pageId}`);
+            const comments = [];
+
+            for ( const data of response ) {
+                comments.push( new Comment( data ) );
+            }
+
+            this.comments = comments;
         }
     }
 } );

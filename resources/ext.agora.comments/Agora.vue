@@ -21,17 +21,20 @@
     </div>
   </div>
   <h3>{{ $i18n( 'agora-comments-header', totalCount ).text() }}</h3>
+  <comment-list></comment-list>
 </template>
 
 <script>
 const restClient = require( 'telepedia.fetch' );
-const { defineComponent, ref, nextTick } = require( 'vue' );
+const { defineComponent, ref, nextTick, onMounted } = require( 'vue' );
 const { useCommentStore } = require( './store.js' );
 const { CdxButton } = require( './../codex.js' );
+const CommentList = require( './components/CommentList.vue' );
 module.exports = defineComponent( {
   name: 'Agora',
   components: {
-    CdxButton
+    CdxButton,
+    CommentList
   },
   setup() {
     console.log("Agora initialised....");
