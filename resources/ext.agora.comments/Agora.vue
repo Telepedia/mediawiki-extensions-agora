@@ -29,6 +29,7 @@ const restClient = require( 'telepedia.fetch' );
 const { defineComponent, ref, nextTick, onMounted } = require( 'vue' );
 const { useCommentStore } = require( './store.js' );
 const { CdxButton } = require( './../codex.js' );
+const { generateAvatar } = require( './utils.js' );
 const CommentList = require( './components/CommentList.vue' );
 module.exports = defineComponent( {
   name: 'Agora',
@@ -43,18 +44,7 @@ module.exports = defineComponent( {
     const store = useCommentStore();
     store.initFromMW();
 
-    const avatar = document.createElement( 'div' );
-    avatar.classList.add( 'agora-avatar' );
-
-    const avatarImage = document.createElement( 'img' );
-    avatarImage.classList.add( 'agora-avatar__img' );
-    avatarImage.src = store.currentUserAvatar;
-    avatarImage.loading = "lazy";
-    avatarImage.title = "User Avatar";
-    avatarImage.alt = "User Avatar";
-
-    avatar.appendChild( avatarImage );
-    const avatarHtml = avatar.outerHTML;
+    const avatar = generateAvatar( store.currentUserAvatar );
 
     let inputContainer = ref( null );
     let editorInstance = null;
@@ -111,7 +101,7 @@ module.exports = defineComponent( {
     return {
       totalCount: store.totalComments,
       store: store,
-      avatar: avatarHtml,
+      avatar,
       activateEditor,
       saveComment,
       cancelEditor,

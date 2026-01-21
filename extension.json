@@ -54,7 +54,8 @@
         "ext.agora.comments/Agora.vue",
         "ext.agora.comments/store.js",
         "ext.agora.comments/components/CommentList.vue",
-        "ext.agora.comments/comment.js"
+        "ext.agora.comments/comment.js",
+        "ext.agora.comments/utils.js"
       ],
       "messages": [
         "agora-comments-header",
