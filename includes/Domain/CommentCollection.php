@@ -50,10 +50,31 @@ class CommentCollection extends ArrayObject implements JsonSerializable {
 		}
 	}
 
+	public function withoutDeleted(): CommentCollection {
+		return $this->filter(
+			fn ( $comment ) => !$comment->isDeleted()
+		);
+	}
+
 	/**
 	 * @return array
 	 */
 	public function jsonSerialize(): array {
 		return array_values( $this->parents );
+	}
+
+	/**
+	 * Filter this collection
+	 * @param callable $callback
+	 * @return $this
+	 */
+	public function filter( callable $callback ): static {
+		$filteredResults = [];
+		foreach ( $this as $key => $value ) {
+			if ( $callback( $value, $key ) ) {
+				$filteredResults[$key] = $value;
+			}
+		}
+		return new static( $filteredResults );
 	}
 }

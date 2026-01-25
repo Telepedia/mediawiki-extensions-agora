@@ -57,10 +57,11 @@ class CommentFactory {
 
 	/**
 	 * Return all the comments associated with a specific article ID
-	 * @param int $pageId
+	 * @param Title $title
+	 * @param bool $hideDeleted whether we should hide the deleted comments
 	 * @return CommentCollection
 	 */
-	public function getForPage( Title $title ): CommentCollection {
+	public function getForPage( Title $title, bool $hideDeleted ): CommentCollection {
 		$articleId = $title->getArticleID();
 		$dbr = $this->connectionProvider->getReplicaDatabase();
 
@@ -94,7 +95,15 @@ class CommentFactory {
 			$this->hydrateActors( $comments, array_unique( $actorIds ) );
 		}
 
-		return new CommentCollection( $comments );
+		$allComments = null;
+
+		if ( $hideDeleted ) {
+			$allComments = ( new CommentCollection( $comments ) )->withoutDeleted();
+		} else {
+			$allComments = new CommentCollection( $comments );
+		}
+
+		return $allComments;
 	}
 
 	/**
