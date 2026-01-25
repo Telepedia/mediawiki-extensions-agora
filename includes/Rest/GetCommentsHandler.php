@@ -35,10 +35,21 @@ class GetCommentsHandler extends SimpleHandler {
 			);
 		}
 
-		$allComments = $this->commentFactory->getForPage( $title );
+		$comments = null;
+
+		// this is a bit fucked?!
+		$hideDeleted = $this->getValidatedParams()['hideDeleted'];
+		$isMod = $this->getAuthority()->isDefinitelyAllowed( 'comments-admin' );
+
+		if ( $isMod ) {
+			$allComments = $this->commentFactory->getForPage( $title, $hideDeleted );
+		} else {
+			$allComments = $this->commentFactory->getForPage( $title, true );
+		}
+
 		$comments['comments'] = $allComments->jsonSerialize();
 
-		$comments['isMod'] = $this->getAuthority()->isDefinitelyAllowed( 'comments-admin' );
+		$comments['isMod'] = $isMod;
 
 		return $this->getResponseFactory()->createJson( $comments );
 	}
@@ -59,6 +70,11 @@ class GetCommentsHandler extends SimpleHandler {
 				self::PARAM_SOURCE => 'path',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => true,
+			],
+			'hideDeleted' => [
+				self::PARAM_SOURCE => 'query',
+				ParamValidator::PARAM_TYPE => 'boolean',
+				ParamValidator::PARAM_REQUIRED => false
 			],
 		];
 	}

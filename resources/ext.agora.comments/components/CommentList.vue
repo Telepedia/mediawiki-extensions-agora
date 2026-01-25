@@ -21,7 +21,7 @@
                   <li
                       v-for="( action, key ) in commentActions"
                       :key="key"
-                      @click="action.action"
+                      @click="action.action( comment.id )"
                   >
                     {{ action.title }}
                   </li>
@@ -50,6 +50,7 @@ const { defineComponent, computed, onMounted } = require( 'vue' );
 const { cdxIconEllipsis, cdxIconSpeechBubbleAdd } = require( '../../icons.json' );
 const { CdxIcon } = require( '../../codex.js' );
 const Popover  = require( './Popover.vue' );
+const restClient = require('telepedia.fetch');
 module.exports = defineComponent( {
   name: "CommentList",
   components: {
@@ -99,12 +100,31 @@ module.exports = defineComponent( {
       if ( store.isModerator ) {
         actions.delete = {
           title: mw.message( 'agora-action-delete' ).text(),
-          action: () => console.log( 'Delete clicked' )
+          action: ( id ) => deleteComment( id )
         };
       }
 
       return actions;
     } );
+
+    /**
+     * Delete a comment; if the user has the toggle to show deleted comments, the comment will still appear
+     * in the list for them. If they have toggled that off, then it will immediately be removed from the stack
+     * Deleting a comment will remove its children from the stack also
+     * @param id
+     * @returns {Promise<void>}
+     */
+    async function deleteComment( id ) {
+      try {
+        await restClient.delete(`/comments/v0/comments/delete`, {
+          commentId: id,
+          token: mw.user.tokens.get( 'csrfToken' )
+        });
+
+      } catch ( e ) {
+        console.error( e );
+      }
+    }
 
     return {
       comments,

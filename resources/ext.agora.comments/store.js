@@ -10,7 +10,7 @@ const useCommentStore = defineStore( 'comments', {
         canPost: false,
         isModerator: false,
         sortMode: 'newest',
-        showDeleted: false,
+        hideDeleted: false,
         comments: null,
         isEditorOpen: false,
         currentUserAvatar: null
@@ -20,13 +20,13 @@ const useCommentStore = defineStore( 'comments', {
         initFromMW() {
             this.pageId = mw.config.get( 'wgArticleId' );
             this.totalComments = mw.config.get( 'wgAgora' ).commentCount;
+            this.isModerator = mw.config.get('wgAgora').isMod;
+            this.currentUserAvatar = mw.config.get( 'wgAgora' ).userAvatar;
+            this.pageTitle = mw.config.get( 'wgPageName' );
 
             // @TODO: dynamically get these from stuff to be added to mw.config later
             this.canPost = false;
-            this.isModerator = false;
-            this.showDeleted = false;
-            this.currentUserAvatar = mw.config.get( 'wgAgora' ).userAvatar;
-            this.pageTitle = mw.config.get( 'wgPageName' );
+            this.hideDeleted = false;
         },
 
         setSortMode( mode ) {
@@ -41,16 +41,21 @@ const useCommentStore = defineStore( 'comments', {
             this.isEditorOpen = !this.isEditorOpen;
         },
 
+        /**
+         * Fetch the comments from the API
+         * @returns {Promise<void>}
+         */
         async fetchComments() {
-            const response  =  await restClient.get( `/comments/v0/comments/${this.pageId}`);
-            const comments = [];
-
-            for ( const data of response.comments ) {
-                comments.push( new Comment( data ) );
+            let url = `/comments/v0/comments/${this.pageId}`;
+            if ( this.isModerator ) {
+                url += `?hideDeleted=${this.hideDeleted}`;
             }
 
-            this.comments = comments;
-            this.isModerator = response.isMod ?? false;
+            const response = await restClient.get( url );
+
+            this.comments = response.comments.map(
+                data => new Comment( data )
+            );
         }
     }
 } );

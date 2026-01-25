@@ -115,6 +115,7 @@ class MainHandler implements
 
 		$vars['wgAgora'] = [
 			'commentCount' => $commentService->getCommentCount( $title ),
+			'isMod' => $commentService->userCanDelete( $out->getUser() )
 		];
 		
 		$avatar = null;
