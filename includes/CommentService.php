@@ -10,6 +10,7 @@ use MediaWiki\Permissions\RestrictionStore;
 use MediaWiki\Title\Title;
 use ParserOptions;
 use Psr\Log\LoggerInterface;
+use StatusValue;
 use Telepedia\Extensions\Agora\Domain\Comment;
 use Wikimedia\Rdbms\IConnectionProvider;
 use Wikimedia\Rdbms\IDatabase;
@@ -19,6 +20,16 @@ class CommentService {
 	public const CONSTRUCTOR_OPTIONS = [
 		MainConfigNames::ContentNamespaces
 	];
+
+	/**
+	 * Table name for the comment table to avoid writing it all the time
+	 */
+	private const TABLE_NAME = 'agora_comments';
+
+	/**
+	 * Table name for the revision table to avoid writing it all the time
+	 */
+	private const REVISION_TABLE_NAME = 'agora_comment_revision';
 
 	public function __construct(
 		private readonly ServiceOptions $options,
@@ -100,6 +111,25 @@ class CommentService {
 	 */
 	public function userCanComment( Authority $user ): bool {
 		if ( !$user->isDefinitelyAllowed( 'comments' ) ) {
+			return false;
+		}
+
+		$block = $user->getBlock();
+
+		if ( $block && ( $block->isSitewide() || $block->appliesToRight( 'agora-comments' ) ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Check whether the current user is able to (soft)delete comments
+	 * @param Authority $user the authority of the user in question
+	 * @return bool true if they can, false otherwise
+	 */
+	public function userCanDelete( Authority $user ): bool {
+		if ( !$user->isDefinitelyAllowed( 'comments-admin' ) ) {
 			return false;
 		}
 
@@ -206,5 +236,35 @@ class CommentService {
 		$parserOpts = ParserOptions::newFromUser( $user );
 
 		return $parsoidFactory->parse( $wt, $title,$parserOpts )->getText();
+	}
+
+	/**
+	 * Soft delete a comment - a soft deleted comment is only visible to those with the comments-admin
+	 * permission
+	 * @param Comment $comment the comment we are deleting
+	 * @param int $actorId the actor responsible for deleting this comment
+	 * @return StatusValue
+	 */
+	public function softDeleteComment( Comment $comment, int $actorId ): StatusValue {
+		$dbw = $this->connectionProvider->getPrimaryDatabase();
+
+		$dbw->newUpdateQueryBuilder()
+			->update( self::TABLE_NAME )
+			->set( [
+				'comment_deleted_actor' => $actorId,
+			] )
+			->where( [
+				'comment_id' => $comment->getId()
+			] )
+			->caller( __METHOD__ )
+			->execute();
+
+		$affected = $dbw->affectedRows();
+
+		if ( $affected !== 1 ) {
+			return StatusValue::newFatal( 'agora-error-delete-writes', $affected );
+		}
+
+		return StatusValue::newGood();
 	}
 }

@@ -4,6 +4,7 @@
   "agora-comments-input-placeholder": "Add a comment about $1",
   "agora-ve-placeholder": "What's on your mind?",
   "agora-error-not-allowed": "You are unable to post comments",
+  "agora-error-not-allowed-delete": "You are unable to delete comments",
   "restriction-commenting": "Commenting",
   "agora-error-malformed-request": "The request was malformed. It must include either an articleId or parentId",
   "agora-error-malformed-wikitext": "The request was malformed. The request must contain the wikitext parameter",
@@ -15,5 +16,8 @@
   "agora-action-delete": "Delete Comment",
   "agora-action-follow": "Follow Comment",
   "agora-action-report": "Report Comment",
-  "agora-action-history": "History"
+  "agora-action-history": "History",
+  "agora-error-comment-missing": "An error occurred. Comment could not be found.",
+  "agora-error-actor-id-missing": "Could not retrieve actor id for user.",
+  "agora-error-delete-writes": "Deletion affected $1 rows, 1 expected"
 }

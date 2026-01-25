@@ -127,6 +127,17 @@
         "Agora.CommentService",
         "TitleFactory"
       ]
+    },
+    {
+      "path": "/comments/v0/comments/delete",
+      "method": [
+        "DELETE"
+      ],
+      "class": "Telepedia\\Extensions\\Agora\\Rest\\DeleteCommentHandler",
+      "services": [
+        "Agora.CommentFactory",
+        "Agora.CommentService"
+      ]
     }
   ],
   "ConfigRegistry": {
