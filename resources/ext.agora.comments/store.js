@@ -56,6 +56,8 @@ const useCommentStore = defineStore( 'comments', {
             this.comments = response.comments.map(
                 data => new Comment( data )
             );
+
+            this.commentCount = response.comments.length;
         }
     }
 } );

@@ -19,5 +19,6 @@
   "agora-action-history": "History",
   "agora-error-comment-missing": "An error occurred. Comment could not be found.",
   "agora-error-actor-id-missing": "Could not retrieve actor id for user.",
-  "agora-error-delete-writes": "Deletion affected $1 rows, 1 expected"
+  "agora-error-delete-writes": "Deletion affected $1 rows, 1 expected",
+  "agora-comment-deleted": "Deleted"
 }

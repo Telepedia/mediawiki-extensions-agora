@@ -9,13 +9,10 @@ class Comment {
         this.author = data.author;
         this.timestamp = data.timestamp;
         this.parent = data.parent || null;
+        this.isDeleted = data.isDeleted;
         this.deletedActor = data.deletedActor || null;
 
         this.children = ( data.children || [] ).map( childData => new Comment( childData ) );
-    }
-
-    get isDeleted() {
-        return this.deletedActor !== null;
     }
 
     get isTopLevel() {

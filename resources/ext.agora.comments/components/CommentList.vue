@@ -2,6 +2,14 @@
   <div class="agora-comments-list">
     <div class="comment-wrapper" v-for="comment in comments" :key="comment.id">
       <div class="comment">
+        <div v-if="comment.isDeleted" class="comment__body-deleted">
+          <div class="comment__body-deleted-wrapper">
+            <div class="comment__body-deleted-text">
+              {{ $i18n('agora-comment-deleted').text() }}
+            </div>
+            <cdx-icon class="comment__restore-icon" :icon="cdxIconRestore"></cdx-icon>
+          </div>
+        </div>
         <div class="comment__body">
           <div class="comment__body-header">
             <div class="comment__body-details">
@@ -47,7 +55,7 @@
 <script>
 const { useCommentStore } = require("./../store.js");
 const { defineComponent, computed, onMounted } = require( 'vue' );
-const { cdxIconEllipsis, cdxIconSpeechBubbleAdd } = require( '../../icons.json' );
+const { cdxIconEllipsis, cdxIconSpeechBubbleAdd, cdxIconRestore } = require( '../../icons.json' );
 const { CdxIcon } = require( '../../codex.js' );
 const Popover  = require( './Popover.vue' );
 const restClient = require('telepedia.fetch');
@@ -130,7 +138,8 @@ module.exports = defineComponent( {
       comments,
       cdxIconEllipsis,
       cdxIconSpeechBubbleAdd,
-      commentActions
+      commentActions,
+      cdxIconRestore
     }
   }
 } );
@@ -150,11 +159,7 @@ module.exports = defineComponent( {
   padding: 18px;
   background: @background-color-neutral;
   width: 100%;
-}
-
-.comment {
-  display: flex;
-  flex-direction: row;
+  box-sizing: border-box;
 }
 
 .comment__body-header {
@@ -183,16 +188,17 @@ module.exports = defineComponent( {
 }
 
 .comment__body-interactions {
-  float: right;
+  display: flex;
+  justify-content: end;
 
   &-reply {
     display: flex;
     align-items: center;
     gap: 5px;
-  }
 
-  &:hover {
-    cursor: pointer;
+    &:hover {
+      cursor: pointer;
+    }
   }
 }
 
@@ -233,6 +239,33 @@ module.exports = defineComponent( {
     &:hover {
       background-color: @background-color-neutral-subtle;
     }
+  }
+}
+
+.comment__body-deleted {
+  background-color: @background-color-neutral;
+}
+
+.comment__body-deleted-wrapper {
+  padding: 12px 0 11px 0;
+  margin: 0 24px;
+  border-bottom: 1px solid @border-color-base;
+  box-sizing: border-box;
+  display: flex;
+
+  .comment__body-deleted-text {
+    flex-grow: 1;
+  }
+}
+
+
+.comment__restore-icon {
+  color: green;
+  opacity: 0.5;
+
+  &:hover {
+    cursor: pointer;
+    opacity: 1;
   }
 }
 </style>
