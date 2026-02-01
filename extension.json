@@ -58,6 +58,8 @@
         "ext.agora.comments/comment.js",
         "ext.agora.comments/utils.js",
         "ext.agora.comments/components/Popover.vue",
+		"ext.agora.comments/components/SingleComment.vue",
+		"ext.agora.comments/components/AgoraEditor.vue",
         {
           "name": "icons.json",
           "callback": "MediaWiki\\ResourceLoader\\CodexModule::getIcons",

@@ -1,69 +1,21 @@
 <template>
-  <div class="agora-comments-list">
-    <div class="comment-wrapper" v-for="comment in comments" :key="comment.id">
-      <div class="comment">
-        <div v-if="comment.isDeleted" class="comment__body-deleted">
-          <div class="comment__body-deleted-wrapper">
-            <div class="comment__body-deleted-text">
-              {{ $i18n('agora-comment-deleted').text() }}
-            </div>
-            <cdx-icon class="comment__restore-icon" :icon="cdxIconRestore" @click="restoreComment(comment.id)"></cdx-icon>
-          </div>
-        </div>
-        <div class="comment__body">
-          <div class="comment__body-header">
-            <div class="comment__body-details">
-              <div v-html="comment.getAvatar()"></div>
-              <div v-html="comment.getLinkToUserPage()"></div>
-              <div class="time" v-html="comment.getFormattedTime()"></div>
-            </div>
-            <div class="comment__body-actions-wrapper">
-              <cdx-icon
-                  class="comment__body-actions"
-                  :icon="cdxIconEllipsis"
-                  size="small"
-              ></cdx-icon>
-
-              <Popover>
-                <ul class="agora-actions-list">
-                  <li
-                      v-for="( action, key ) in commentActions"
-                      :key="key"
-                      @click="action.action( comment.id )"
-                  >
-                    {{ action.title }}
-                  </li>
-                </ul>
-              </Popover>
-            </div>
-          </div>
-          <div v-html="comment.html"></div>
-          <div class="comment__body-interactions" v-if="!comment.isDeleted">
-            <div class="comment__body-interactions-reply">
-            <cdx-icon
-                :icon="cdxIconSpeechBubbleAdd"
-                size="small"
-            ></cdx-icon> Reply
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+	<div class="agora-comments-list">
+		<single-comment
+			v-for="comment in comments"
+			:key="comment.id"
+			:comment="comment"
+		></single-comment>
+	</div>
 </template>
 
 <script>
 const { useCommentStore } = require("./../store.js");
 const { defineComponent, computed, onMounted } = require( 'vue' );
-const { cdxIconEllipsis, cdxIconSpeechBubbleAdd, cdxIconRestore } = require( '../../icons.json' );
-const { CdxIcon } = require( '../../codex.js' );
-const Popover  = require( './Popover.vue' );
-const restClient = require('telepedia.fetch');
+const SingleComment = require( './SingleComment.vue' );
 module.exports = defineComponent( {
   name: "CommentList",
   components: {
-    CdxIcon,
-    Popover
+	SingleComment,
   },
   setup() {
     const store = useCommentStore();
@@ -78,50 +30,8 @@ module.exports = defineComponent( {
       }
     } );
 
-    /**
-     * Simple map of each of the items in the dropdown
-     * @TODO: add icons to this eventually
-     */
-    const commentActions = computed( () => {
-      const actions = {
-        edit: {
-          title: mw.message( 'agora-action-edit' ).text(),
-          action: () => console.log( 'Edit clicked' )
-        },
-        follow: {
-          title: mw.message( 'agora-action-follow' ).text(),
-          action: () => console.log( 'Follow clicked' )
-        },
-        report: {
-          title: mw.message( 'agora-action-report' ).text(),
-          action: () => console.log( 'Report clicked' )
-        },
-        history: {
-          title: mw.message( 'agora-action-history' ).text(),
-          action: () => console.log( 'History clicked' )
-        }
-      };
-
-      // if the user has the comments-admin permission (the API returns this check and sets it on the store)
-      // then add the delete action to the API - this is mostly just for visual, the API endpoint will enforce this in
-      // any case
-      if ( store.isModerator ) {
-        actions.delete = {
-          title: mw.message( 'agora-action-delete' ).text(),
-          action: ( id ) => store.deleteComment( id )
-        };
-      }
-
-      return actions;
-    } );
-
     return {
-      comments,
-      cdxIconEllipsis,
-      cdxIconSpeechBubbleAdd,
-      commentActions,
-      cdxIconRestore,
-      restoreComment: store.restoreComment
+      comments
     }
   }
 } );
