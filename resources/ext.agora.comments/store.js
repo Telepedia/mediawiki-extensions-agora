@@ -120,7 +120,54 @@ const useCommentStore = defineStore( 'comments', {
                     position: 'bottom-left'
                 } ).show();
             }
-        }
+        },
+
+		/**
+		 * Save the comment to the backend. Here we only send the wikitext to the API as the source of truth. The backend
+		 * will parse using Parsoid, save the HTML to the database, and then return both the HTML and the Wikitext for
+		 * addition to the frontend. This also has the benefit that Parsoid will sanitise the input
+		 * @returns {Promise<void>}
+		 */
+		async postComment( { parentId, wikitext } ) {
+			const payload = {
+				articleId: mw.config.get( 'wgRelevantArticleId' ),
+				wikitext: wikitext,
+				token: mw.user.tokens.get( 'csrfToken' )
+			};
+
+			if ( parentId ) {
+				payload.parentId = parentId;
+			}
+
+			const res = await restClient.post( '/comments/v0/comment', payload );
+
+			const newComment = new Comment( res.comment );
+
+			if ( parentId ) {
+				const parent = this.findCommentById( parentId );
+				if( parent ) parent.addChild( newComment );
+			} else {
+				this.comments.unshift( newComment );
+				this.totalComments++;
+			}
+		},
+
+		/**
+		 * Helper to find the comment by its ID from the stack of comments
+		 * @param id
+		 * @param list
+		 * @returns {*|null}
+		 */
+		findCommentById( id, list = this.comments ) {
+			for( const c of list ) {
+				if( c.id === id ) return c;
+				if( c.children.length ) {
+					const found = this.findCommentById( id, c.children );
+					if( found ) return found;
+				}
+			}
+			return null;
+		}
     }
 } );
 

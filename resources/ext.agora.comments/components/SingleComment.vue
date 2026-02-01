@@ -11,21 +11,18 @@
 			</div>
 
 			<div class="comment__body">
-
 				<div class="comment__body-header">
 					<div class="comment__body-details">
 						<div v-html="comment.getAvatar()"></div>
 						<div v-html="comment.getLinkToUserPage()"></div>
 						<div class="time" v-html="comment.getFormattedTime()"></div>
 					</div>
-
 					<div class="comment__body-actions-wrapper">
 						<cdx-icon
 							class="comment__body-actions"
 							:icon="cdxIconEllipsis"
 							size="small"
 						></cdx-icon>
-
 						<Popover>
 							<ul class="agora-actions-list">
 								<li
@@ -39,7 +36,6 @@
 						</Popover>
 					</div>
 				</div>
-
 				<div class="comment__content">
 					<div v-if="isEditing">
 						<div v-if="isLoadingHtml">Loading source...</div>
@@ -50,18 +46,24 @@
 							@cancel="cancelEdit"
 						></agora-editor>
 					</div>
-
 					<div v-else>
 						<div v-html="comment.html"></div>
 
-						<div class="comment__body-interactions">
+						<div class="comment__body-interactions" v-if="!isReplying">
 							<div class="comment__body-interactions-reply">
-								<cdx-icon :icon="cdxIconSpeechBubbleAdd"></cdx-icon> Reply
+								<cdx-icon :icon="cdxIconSpeechBubbleAdd" @click="isReplying = !isReplying"></cdx-icon> Reply
 							</div>
 						</div>
 					</div>
 				</div>
-
+				<div v-if="isReplying" class="comment__reply-container">
+					<agora-comment-input
+						:parent-id="comment.id"
+						:placeholder="'Reply to ' + comment.author.name + '...'"
+						@post-created="isReplying = false"
+						@cancel="isReplying = false"
+					></agora-comment-input>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -72,7 +74,7 @@ const { defineComponent, ref, computed } = require( 'vue' );
 const { cdxIconEllipsis, cdxIconSpeechBubbleAdd, cdxIconRestore } = require( '../../icons.json' );
 const { CdxIcon } = require( '../../codex.js' );
 const Popover  = require( './Popover.vue' );
-const restClient = require('telepedia.fetch');
+const AgoraCommentInput = require( './AgoraCommentInput.vue' );
 const AgoraEditor = require('./AgoraEditor.vue');
 const { useCommentStore } = require("./../store.js");
 
@@ -81,7 +83,8 @@ module.exports = defineComponent( {
 	components: {
 		CdxIcon,
 		AgoraEditor,
-		Popover
+		Popover,
+		AgoraCommentInput
 	},
 	props: [ 'comment' ],
 	emits: [ 'reply' ],
@@ -90,6 +93,7 @@ module.exports = defineComponent( {
 		const isEditing = ref( false );
 		const wikitext = ref( '' );
 		const isLoadingHtml = ref( false );
+		const isReplying = ref( false );
 
 		const startEdit = async () => {
 			isEditing.value = true;
@@ -172,7 +176,8 @@ module.exports = defineComponent( {
 			cdxIconSpeechBubbleAdd,
 			cdxIconRestore,
 			commentActions,
-			restoreComment: store.restoreComment
+			restoreComment: store.restoreComment,
+			isReplying
 		}
 	}
 } );
